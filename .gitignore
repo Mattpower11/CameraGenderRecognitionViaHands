@@ -1,0 +1,59 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter Notebooks checkpoint files
+.ipynb_checkpoints/
+
+# Virtual environments
+env/
+venv/
+ENV/
+.venv/
+.ENV/
+
+# PyTorch saved models
+*.pt
+*.pth
+
+# Numpy binary files
+*.npy
+*.npz
+
+# OpenCV generated cache (if any)
+cv2*.log
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# Logs and debugging
+*.log
+*.tmp
+*.bak
+
+# Test output
+htmlcov/
+.coverage
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+
+# MyPy
+.mypy_cache/
+
+# Other
+*.swp
+*.swo

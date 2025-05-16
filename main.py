@@ -9,6 +9,7 @@ from PerformanceEvaluation import *
 from StreamEvaluation import streamEvaluation
 from CustomTransform import buildAlexNetTransformations, buildLeNetTransformations
 
+
 # Create the networks
 leNet = MyLeNetCNN(num_classes=2)
 alexNet1 = torchvision.models.alexnet(weights=torchvision.models.AlexNet_Weights.IMAGENET1K_V1)
@@ -17,9 +18,9 @@ alexNet2 = torchvision.models.alexnet(weights=torchvision.models.AlexNet_Weights
 # Set number of experiments
 num_exp = 5
 image_path = '/home/mattpower/Downloads/Hands'
-net_palmar_model_path = '/home/mattpower/Documents/backup/Magistrale/Sapienza/ComputerScience/FDS/SecretProject/GenderRecognitionViaHands/11kHands_gender_afifi2017_/Progetto/models/net_palmar.pth'
-net_dorsal_model_path = '/home/mattpower/Documents/backup/Magistrale/Sapienza/ComputerScience/FDS/SecretProject/GenderRecognitionViaHands/11kHands_gender_afifi2017_/Progetto/models/net_dorsal.pth'
-csv_path = '/home/mattpower/Documents/backup/Magistrale/Sapienza/ComputerScience/FDS/SecretProject/GenderRecognitionViaHands/11kHands_gender_afifi2017_/Progetto/HandInfo.csv'
+net_palmar_model_path = 'models/net_palmar.pth'
+net_dorsal_model_path = 'models/net_dorsal.pth'
+csv_path = 'HandInfo.csv'
 num_train = 50
 num_test = 20
 

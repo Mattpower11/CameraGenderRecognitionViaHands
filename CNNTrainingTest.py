@@ -25,8 +25,7 @@ def trainingCNN(net:nn.Module, transforms:list, data_struct:dict, image_path:str
 
     for exp in range(tot_exp):
         #Training the model
-
-        dataset_train = CustomImageDataset(image_dir=image_path, data_structure = data_struct, id_exp=exp, train_test='train', palmar_dorsal=palmar_dorsal, transform=transforms)
+        dataset_train = CustomImageDataset(image_dir=image_path, data_structure = data_struct, id_exp=exp, palmar_dorsal=palmar_dorsal, transform=transforms)
         data_loader_train = DataLoader(dataset_train, batch_size=batch_size, shuffle=False)
         net.train()
         running_loss = 0.0

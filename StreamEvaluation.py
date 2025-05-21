@@ -21,10 +21,10 @@ def streamEvaluation(net1:nn.Module, net2:nn.Module, transforms:list, weights_pa
 
     with torch.no_grad():
         for exp in range(tot_exp):
-            dataset_dorsal = CustomImageDataset(image_dir=image_path, data_structure= data_struct, id_exp=exp, train_test='test', palmar_dorsal='dorsal', transform=transforms)
+            dataset_dorsal = CustomImageDataset(image_dir=image_path, data_structure= data_struct, id_exp=exp, palmar_dorsal='dorsal', transform=transforms)
             data_loader_dorsal = DataLoader(dataset_dorsal, batch_size=batch_size, shuffle=False)
            
-            dataset_palmar = CustomImageDataset(image_dir=image_path, data_structure= data_struct, id_exp=exp, train_test='test', palmar_dorsal='palmar', transform=transforms)
+            dataset_palmar = CustomImageDataset(image_dir=image_path, data_structure= data_struct, id_exp=exp, palmar_dorsal='palmar', transform=transforms)
             data_loader_palmar= DataLoader(dataset_palmar, batch_size=batch_size, shuffle=False)
 
             for data_dorsal, data_palmar in zip(data_loader_dorsal, data_loader_palmar):

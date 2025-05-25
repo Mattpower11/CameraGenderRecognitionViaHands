@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from CustomImageDataset import CustomImageDataset
+from PIL import Image
 
 # Function to train the CNN
 # net: the CNN model
@@ -45,31 +46,31 @@ def trainingCNN(net:nn.Module, transforms:list, data_struct:dict, image_path:str
 
     return loss_values
 
-def testCNN(net:nn.Module, transforms:list, data_struct:dict, image_path:str, palmar_dorsal:str, tot_exp: int, batch_size=32):
+def testCNN(net:nn.Module, transforms, image_path:str):
     # Move the model to the appropriate device
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     net.to(device)
     net.eval()
-    tot_labels = torch.tensor([])
-    tot_predicted = torch.tensor([])
+    predicted_label = "Male"
     with torch.no_grad():
 
-        for exp in range(tot_exp):
+        # Open images using path
+        image = Image.open(image_path).convert("RGB")
+        
+        # Apply transformations
+        image = transforms(image)
+        image = image.unsqueeze(0)
 
-            dataset_test = CustomImageDataset(image_dir=image_path, data_structure= data_struct, id_exp=exp, train_test='test', palmar_dorsal=palmar_dorsal, transform=transforms)
-            data_loader_test = DataLoader(dataset_test, batch_size=batch_size, shuffle=False)
-            for data in data_loader_test:
-                
-                images, labels = data
-                images, labels = images.to(device), labels.to(device)
-                # Softmax layer
-                outputs = net(images)
+        # Softmax layer
+        output = net(image)
 
-                # Classification layer
-                _, predicted = torch.max(outputs.data, 1)
+        # Classification layer
+        predicted_score = torch.max(output.data, 1)
 
-                tot_labels = torch.cat((tot_labels, labels))
-                tot_predicted = np.concatenate((tot_predicted, predicted))
+        if predicted_score == 0:
+            predicted_label = "Male"
+        else:
+            predicted_label = "Female"
 
-    return tot_labels, tot_predicted
+    return predicted_label

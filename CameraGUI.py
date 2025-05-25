@@ -12,7 +12,7 @@ class WebcamApp:
         self.root.title("Webcam Viewer")
         self.root.geometry("800x600")
         self.root.minsize(400, 300)
-        self.photo_count = 0  # Per cambiare la descrizione dopo la prima foto
+        self.photo_count = 0
 
         # Layout configurazione
         self.root.columnconfigure(0, weight=1)
@@ -61,7 +61,6 @@ class WebcamApp:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image = Image.fromarray(frame)
 
-            # Ridimensionamento dinamico
             canvas_width = self.canvas.winfo_width()
             canvas_height = self.canvas.winfo_height()
             if canvas_width > 0 and canvas_height > 0:
@@ -74,30 +73,32 @@ class WebcamApp:
 
     def capture_image(self):
         if hasattr(self, 'current_frame'):
-            # Verifico se è presente una mano nell'immagine
-            if len(get_POI_hand(self.current_frame)) > 0:
+            if self.photo_count >= 2:
+                return  # Non permettere più di 2 foto
 
-                # Salva l'immagine corrente
-                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                label = "palm" if self.photo_count == 0 else "dorsal"
-                filename = f"./photos/hand_{label}_{timestamp}.jpg"
+            if len(get_POI_hand(self.current_frame)) > 0:
+                #timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                label = "palmar" if self.photo_count == 0 else "dorsal"
+                #filename = f"./photos/hand_{label}_{timestamp}.jpg"
+                filename = f"./photos/hand_{label}.jpg"
                 cv2.imwrite(filename, self.current_frame)
                 print(f"Foto salvata: {filename}")
 
-                # Aggiorna descrizione dopo la prima foto
                 self.photo_count += 1
+
                 if self.photo_count == 1:
                     self.description_text.set("Take a photo of your hand dorsal")
+                elif self.photo_count == 2:
+                    self.description_text.set("Photo session completed. You can now exit.")
+                    self.capture_button.config(state="disabled")
             else:
                 print("Nessuna mano rilevata nell'immagine corrente.")
-                # Salva il testo precedente
                 self.previous_description = self.description_text.get()
                 self.description_text.set("Nessuna mano rilevata. Riprova.")
-                # Dopo 5 secondi ripristina il testo precedente
                 self.root.after(5000, self.reset_description)
 
     def reset_description(self):
-        if hasattr(self, 'previous_description'):
+        if hasattr(self, 'previous_description') and self.photo_count < 2:
             self.description_text.set(self.previous_description)
             del self.previous_description
 
@@ -105,7 +106,7 @@ class WebcamApp:
         self.cap.release()
         self.root.destroy()
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = WebcamApp(root)
-    root.mainloop()
+# if __name__ == "__main__":
+#     root = tk.Tk()
+#     app = WebcamApp(root)
+#     root.mainloop()

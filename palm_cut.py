@@ -23,8 +23,7 @@ def get_POI_hand(image) -> list:
                     #print(f"ID Punto {idx}: x={x}, y={y}")
                     coordinate.append((x, y))
     
-
-    print(f"Lunghezza: {len(coordinate)} Coordinate: {coordinate}")
+    #print(f"Lunghezza: {len(coordinate)} Coordinate: {coordinate}")
     return coordinate
 
 def get_palm_cut(image):

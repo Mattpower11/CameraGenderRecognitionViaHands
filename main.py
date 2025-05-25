@@ -7,12 +7,18 @@ import torchvision
 from PerformanceEvaluation import *
 from PrepareDataTrain import prepare_data_train
 from StreamEvaluation import streamEvaluation
-from CustomTransform import buildAlexNetTransformations, buildLeNetTransformations
+from CustomTransform import CustomAlexNetTransform, CustomHOGCannyTransform, CustomLBPCannyTransform, CustomLeNetTransform, buildCustomTransform, buildCustomTransformHogExtended  
+from CameraGUI import WebcamApp
+import tkinter as tk
+from tkinter import ttk
 
 # Create the networks
 leNet = MyLeNetCNN(num_classes=2)
 alexNet1 = torchvision.models.alexnet(weights=torchvision.models.AlexNet_Weights.IMAGENET1K_V1)
 alexNet2 = torchvision.models.alexnet(weights=torchvision.models.AlexNet_Weights.IMAGENET1K_V1)
+
+inputShapeAlexNet = (224, 224)
+inputShapeLeNet = (32, 32)
 
 # Set number of experiments
 num_exp = 5
@@ -55,17 +61,17 @@ if net_palmar == alexNet2 or net_dorsal == alexNet2:
         param.requires_grad = True
 
 # Build the tranformations for the networks
-palmar_transforms = buildAlexNetTransformations()
+palmar_transforms = buildCustomTransform(transform=CustomLBPCannyTransform, resizeShape=inputShapeAlexNet, applyPalmCut=True)
 if isinstance(net_palmar, MyLeNetCNN):
-        palmar_transforms = buildLeNetTransformations()
+        palmar_transforms = buildCustomTransform(transform=CustomLBPCannyTransform, resizeShape=inputShapeLeNet, applyPalmCut=True)
 elif isinstance(net_palmar, torchvision.models.AlexNet):
-        palmar_transforms = buildAlexNetTransformations()
+        palmar_transforms = buildCustomTransform(transform=CustomLBPCannyTransform, resizeShape=inputShapeAlexNet, applyPalmCut=True)
 
-dorsal_transforms = buildAlexNetTransformations()
+dorsal_transforms = buildCustomTransformHogExtended(transform=CustomHOGCannyTransform, resizeShape=inputShapeAlexNet, applyPalmCut=False, ksize=(3,3), sigma=1)
 if isinstance(net_dorsal, MyLeNetCNN):
-        dorsal_transforms = buildLeNetTransformations()
+        dorsal_transforms = buildCustomTransformHogExtended(transform=CustomHOGCannyTransform, resizeShape=inputShapeLeNet, applyPalmCut=False, ksize=(3,3), sigma=1)
 elif isinstance(net_dorsal, torchvision.models.AlexNet):
-        dorsal_transforms = buildAlexNetTransformations()
+        dorsal_transforms = buildCustomTransformHogExtended(transform=CustomHOGCannyTransform, resizeShape=inputShapeAlexNet, applyPalmCut=False, ksize=(3,3), sigma=1)
 
 transforms = [
     palmar_transforms,
@@ -74,9 +80,6 @@ transforms = [
 
 # Weights for the fusion
 weights_palmar_dorsal = [weight_palmar, weight_dorsal]
-
-# Prepare data
-data_struct = prepare_data_train(csv_path=csv_path, num_exp=num_exp, num_train=num_train)
 
 # Check if models are available
 if os.path.exists(net_palmar_model_path) and os.path.exists(net_dorsal_model_path):
@@ -87,6 +90,9 @@ if os.path.exists(net_palmar_model_path) and os.path.exists(net_dorsal_model_pat
 else:
     print(f"Model not found at {net_palmar_model_path} or {net_dorsal_model_path}. Training from scratch.\n")
 
+    # Prepare data
+    data_struct = prepare_data_train(csv_path=csv_path, num_exp=num_exp, num_train=num_train)
+
     # Training the networks
     print('Begin Palm Training\n')
     train_loss_p = trainingCNN(net=net_palmar, transforms=transforms, data_struct=data_struct, image_path=image_path, palmar_dorsal='palmar', tot_exp=num_exp)
@@ -95,17 +101,28 @@ else:
     train_loss_d = trainingCNN(net=net_dorsal, transforms=transforms, data_struct=data_struct, image_path=image_path, palmar_dorsal='dorsal', tot_exp=num_exp)
     print('\nFinished Dorsal Training\n')
 
+# Call CameraGUI.py to capture images
+root = tk.Tk()
+app = WebcamApp(root)
+root.mainloop()
+
+palmar_image_path = os.path.join('./photos', 'hand_palmar.jpg')
+dorsal_image_path = os.path.join('./photos', 'hand_dorsal.jpg')
+
 # Test the networks
-# print('Begin Palm Testing')
-# palmar_labels, palmar_predicted = testCNN(net=net_palmar, transforms=transforms, data_struct=data_struct, image_path=image_path, palmar_dorsal='palmar', tot_exp=num_exp)
-# print('Finished Palm Testing\n')
-# print('Begin Dorsal Testing')
-# dorsal_labels, dorsal_predicted = testCNN(net=net_dorsal, transforms=transforms, data_struct=data_struct, image_path=image_path, palmar_dorsal='dorsal', tot_exp=num_exp)
-# print('Finished Dorsal Testing\n')
+print('Begin Palm Testing')
+palmar_predicted = testCNN(net=net_palmar, transforms=palmar_transforms, image_path=palmar_image_path)
+print('The predicted label for the palmar image using a single CNN is:', palmar_predicted)
+print('Finished Palm Testing\n')
+print('Begin Dorsal Testing')
+dorsal_predicted = testCNN(net=net_dorsal, transforms=dorsal_transforms, image_path=dorsal_image_path)
+print('The predicted label for the dorsal image using a single CNN is:', dorsal_predicted)
+print('Finished Dorsal Testing\n')
 
 # Evaluate the unified network
 print("Begin Unified Network Testing")
-un_labels, un_predicted  = streamEvaluation(net1=net_palmar, net2=net_dorsal, transforms=transforms, weights_palmar_dorsal=weights_palmar_dorsal, data_struct=data_struct, image_path=image_path, tot_exp=num_exp)
+un_predicted  = streamEvaluation(net1=net_palmar, net2=net_dorsal, dorsal_trasforms=dorsal_transforms, palmar_transforms=palmar_transforms, weights_palmar_dorsal=weights_palmar_dorsal, palmar_image_path=palmar_image_path, dorsal_image_path=dorsal_image_path)
+print("The predicted label for the unified network is:", un_predicted)
 print("Finished Unified Network Testing\n")
 
 

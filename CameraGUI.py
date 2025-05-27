@@ -80,7 +80,7 @@ class WebcamApp:
                 #timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 label = "palmar" if self.photo_count == 0 else "dorsal"
                 #filename = f"./photos/hand_{label}_{timestamp}.jpg"
-                filename = f"./photos/hand_{label}.jpg"
+                filename = f".\photos\hand_{label}.jpg"
                 cv2.imwrite(filename, self.current_frame)
                 print(f"Foto salvata: {filename}")
 

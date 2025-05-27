@@ -21,12 +21,12 @@ inputShapeAlexNet = (224, 224)
 inputShapeLeNet = (32, 32)
 
 # Set number of experiments
-num_exp = 5
-image_path = '/home/mattpower/Downloads/Hands'
-net_palmar_model_path = 'models/net_palmar.pth'
-net_dorsal_model_path = 'models/net_dorsal.pth'
-csv_path = 'HandInfo.csv'
-num_train = 50
+num_exp = 15
+image_path = 'D:\\Users\\Patrizio\\Desktop\\Hands'
+net_palmar_model_path = 'models\net_palmar.pth'
+net_dorsal_model_path = 'models\net_dorsal.pth'
+csv_path = os.path.join(os.path.dirname(__file__), 'HandInfo.csv')
+num_train = 80
 
 
 # Set the networks
@@ -106,8 +106,9 @@ root = tk.Tk()
 app = WebcamApp(root)
 root.mainloop()
 
-palmar_image_path = os.path.join('./photos', 'hand_palmar.jpg')
-dorsal_image_path = os.path.join('./photos', 'hand_dorsal.jpg')
+photos_dir = os.path.join(os.path.dirname(__file__), 'photos')
+palmar_image_path = os.path.join(photos_dir, 'hand_palmar.jpg')
+dorsal_image_path = os.path.join(photos_dir, 'hand_dorsal.jpg')
 
 # Test the networks
 print('Begin Palm Testing')

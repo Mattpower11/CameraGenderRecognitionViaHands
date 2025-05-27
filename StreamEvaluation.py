@@ -45,7 +45,10 @@ def streamEvaluation(net1:nn.Module, net2:nn.Module, palmar_transforms, dorsal_t
         fused_probs = probs_alexNetPalmar * weights_palmar_dorsal[0] + probs_alexNetDorsal * weights_palmar_dorsal[1]
 
         # Obtain the predicted class
-        predicted_score = torch.max(fused_probs, 1)
+        predicted_score = torch.argmax(fused_probs)
+
+        print(f"Fused probabilities: {fused_probs.data}")
+        print(f"Predicted score: {predicted_score}")
 
         if predicted_score == 0:
             predicted_label = "Male"

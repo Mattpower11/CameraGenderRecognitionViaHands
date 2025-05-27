@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
@@ -60,13 +61,30 @@ def testCNN(net:nn.Module, transforms, image_path:str):
         
         # Apply transformations
         image = transforms(image)
+
+        img_to_show = image.clone()
+        if img_to_show.dim() == 3:
+            img_to_show = img_to_show.permute(1, 2, 0)  # Da [C,H,W] a [H,W,C]
+        img_to_show = img_to_show.cpu().numpy()
+        plt.imshow(img_to_show)
+        plt.title("Immagine dopo le trasformazioni")
+        plt.axis('off')
+        plt.show()
+
         image = image.unsqueeze(0)
 
-        # Softmax layer
         output = net(image)
 
+        # Apply softmax to the output
+        softmax = torch.nn.Softmax(dim=1)
+        probs = softmax(output)
+
         # Classification layer
-        predicted_score = torch.max(output.data, 1)
+        predicted_score = torch.argmax(probs)
+
+        print(probs)
+        print(f"Predicted score: {predicted_score}")
+        # Obtain the predicted class
 
         if predicted_score == 0:
             predicted_label = "Male"

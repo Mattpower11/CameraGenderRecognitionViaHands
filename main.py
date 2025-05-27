@@ -21,12 +21,12 @@ inputShapeAlexNet = (224, 224)
 inputShapeLeNet = (32, 32)
 
 # Set number of experiments
-num_exp = 15
+num_exp = 5
 image_path = 'D:\\Users\\Patrizio\\Desktop\\Hands'
-net_palmar_model_path = 'models\net_palmar.pth'
-net_dorsal_model_path = 'models\net_dorsal.pth'
+net_palmar_model_path = 'models\\net_palmar.pth'
+net_dorsal_model_path = 'models\\net_dorsal.pth'
 csv_path = os.path.join(os.path.dirname(__file__), 'HandInfo.csv')
-num_train = 80
+num_train = 10
 
 
 # Set the networks

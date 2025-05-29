@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
@@ -7,7 +8,11 @@ import datetime
 from palm_cut import get_POI_hand
 
 class WebcamApp:
-    def __init__(self, root):
+    def __init__(self, root, photos_dir="./photos"):
+        if not os.path.exists(photos_dir):
+            os.makedirs(photos_dir)
+
+        self.photos_dir = photos_dir
         self.root = root
         self.root.title("Webcam Viewer")
         self.root.geometry("800x600")
@@ -80,7 +85,7 @@ class WebcamApp:
                 #timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 label = "palmar" if self.photo_count == 0 else "dorsal"
                 #filename = f"./photos/hand_{label}_{timestamp}.jpg"
-                filename = f".\photos\hand_{label}.jpg"
+                filename = os.path.join(self.photos_dir, f"hand_{label}.jpg")
                 cv2.imwrite(filename, self.current_frame)
                 print(f"Foto salvata: {filename}")
 

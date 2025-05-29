@@ -17,17 +17,22 @@ leNet = MyLeNetCNN(num_classes=2)
 alexNet1 = torchvision.models.alexnet(weights=torchvision.models.AlexNet_Weights.IMAGENET1K_V1)
 alexNet2 = torchvision.models.alexnet(weights=torchvision.models.AlexNet_Weights.IMAGENET1K_V1)
 
+# Set project parameters
+num_exp = 5
+num_train = 10
 inputShapeAlexNet = (224, 224)
 inputShapeLeNet = (32, 32)
-
-# Set number of experiments
-num_exp = 5
-image_path = 'D:\\Users\\Patrizio\\Desktop\\Hands'
-net_palmar_model_path = 'models\\net_palmar.pth'
-net_dorsal_model_path = 'models\\net_dorsal.pth'
+image_path = '/home/mattpower/Downloads/Hands'
+model_base_path = os.path.join(os.path.dirname(__file__), 'models')
+photos_dir = os.path.join(os.path.dirname(__file__), 'photos')
+palmar_image_path = os.path.join(photos_dir, 'hand_palmar.jpg')
+dorsal_image_path = os.path.join(photos_dir, 'hand_dorsal.jpg')
 csv_path = os.path.join(os.path.dirname(__file__), 'HandInfo.csv')
-num_train = 10
 
+
+# Create the models directory if it doesn't exist
+if not os.path.exists(model_base_path):
+    os.makedirs(model_base_path)
 
 # Set the networks
 net_palmar = alexNet1
@@ -63,15 +68,25 @@ if net_palmar == alexNet2 or net_dorsal == alexNet2:
 # Build the tranformations for the networks
 palmar_transforms = buildCustomTransformHogExtended(transform=CustomHOGTransform, resizeShape=inputShapeAlexNet, applyPalmCut=True, ksize=(3,3), sigma=1)
 if isinstance(net_palmar, MyLeNetCNN):
-        palmar_transforms = buildCustomTransformHogExtended(transform=CustomHOGTransform, resizeShape=inputShapeLeNet, applyPalmCut=True, ksize=(3,3), sigma=1)
+    palmar_transforms = buildCustomTransform(transform=CustomLBPCannyTransform, resizeShape=inputShapeLeNet, applyPalmCut=True)       
+    net_palmar_model_path = os.path.join(model_base_path, 'LeNet_Palmar.pth')
 elif isinstance(net_palmar, torchvision.models.AlexNet):
-        palmar_transforms = buildCustomTransformHogExtended(transform=CustomHOGTransform, resizeShape=inputShapeAlexNet, applyPalmCut=True, ksize=(3,3), sigma=1)
+    palmar_transforms = buildCustomTransformHogExtended(transform=CustomHOGTransform, resizeShape=inputShapeAlexNet, applyPalmCut=True, ksize=(3,3), sigma=1)
+    if net_palmar == alexNet1:
+        net_palmar_model_path = os.path.join(model_base_path, 'AlexNet1_Palmar.pth')
+    elif net_palmar == alexNet2:
+        net_palmar_model_path = os.path.join(model_base_path, 'AlexNet2_Palmar.pth')
 
 dorsal_transforms = buildCustomTransformHogExtended(transform=CustomHOGTransform, resizeShape=inputShapeAlexNet, applyPalmCut=False, ksize=(3,3), sigma=1)
 if isinstance(net_dorsal, MyLeNetCNN):
-        dorsal_transforms = buildCustomTransformHogExtended(transform=CustomHOGTransform, resizeShape=inputShapeLeNet, applyPalmCut=False, ksize=(3,3), sigma=1)
+    dorsal_transforms = buildCustomTransform(transform=CustomLBPCannyTransform, resizeShape=inputShapeLeNet, applyPalmCut=False)
+    net_dorsal_model_path = os.path.join(model_base_path, 'LeNet_Dorsal.pth')
 elif isinstance(net_dorsal, torchvision.models.AlexNet):
-        dorsal_transforms = buildCustomTransformHogExtended(transform=CustomHOGTransform, resizeShape=inputShapeAlexNet, applyPalmCut=False, ksize=(3,3), sigma=1)
+    dorsal_transforms = buildCustomTransformHogExtended(transform=CustomHOGTransform, resizeShape=inputShapeAlexNet, applyPalmCut=False, ksize=(3,3), sigma=1)
+    if net_dorsal == alexNet1:
+        net_dorsal_model_path = os.path.join(model_base_path, 'AlexNet1_Dorsal.pth')
+    elif net_dorsal == alexNet2:
+        net_dorsal_model_path = os.path.join(model_base_path, 'AlexNet2_Dorsal.pth')
 
 transforms = [
     palmar_transforms,
@@ -83,29 +98,11 @@ weights_palmar_dorsal = [weight_palmar, weight_dorsal]
 
 # Check if models are available
 if os.path.exists(net_palmar_model_path) and os.path.exists(net_dorsal_model_path):
-    if net_palmar == alexNet1:
-        # Load the AlexNet models
-        alexNet1.load_state_dict(torch.load(net_palmar_model_path, weights_only=True))
-        print(f"Loaded model from {net_palmar_model_path}")
-    elif net_dorsal == alexNet1:
-        alexNet1.load_state_dict(torch.load(net_dorsal_model_path, weights_only=True))
-        print(f"Loaded model from {net_dorsal_model_path}")
-         
-    if net_palmar == alexNet2:
-        # Load the AlexNet models
-        alexNet2.load_state_dict(torch.load(net_dorsal_model_path, weights_only=True))
-        print(f"Loaded model from {net_dorsal_model_path}")
-    elif net_dorsal == alexNet2:
-        alexNet2.load_state_dict(torch.load(net_palmar_model_path, weights_only=True))
-        print(f"Loaded model from {net_palmar_model_path}")
+    print(f"Loading pre-trained models from:\n\t{net_palmar_model_path}\n\t{net_dorsal_model_path}\n")
     
-    if net_palmar == leNet:
-        leNet.load_state_dict(torch.load(net_palmar_model_path, weights_only=True))
-        print(f"Loaded model from {net_palmar_model_path}")
-    elif net_dorsal == leNet:
-        leNet.load_state_dict(torch.load(net_dorsal_model_path, weights_only=True))
-        print(f"Loaded model from {net_dorsal_model_path}")
-
+    # Load the pre-trained models
+    net_palmar.load_state_dict(torch.load(net_palmar_model_path, weights_only=True))
+    net_dorsal.load_state_dict(torch.load(net_dorsal_model_path, weights_only=True))
 else:
     print(f"Model not found at {net_palmar_model_path} or {net_dorsal_model_path}. Training from scratch.\n")
 
@@ -120,14 +117,14 @@ else:
     train_loss_d = trainingCNN(net=net_dorsal, transforms=transforms, data_struct=data_struct, image_path=image_path, palmar_dorsal='dorsal', tot_exp=num_exp)
     print('\nFinished Dorsal Training\n')
 
+    # Save the trained models
+    torch.save(net_palmar.state_dict(), net_palmar_model_path)
+    torch.save(net_dorsal.state_dict(), net_dorsal_model_path)
+
 # Call CameraGUI.py to capture images
 root = tk.Tk()
 app = WebcamApp(root)
 root.mainloop()
-
-photos_dir = os.path.join(os.path.dirname(__file__), 'photos')
-palmar_image_path = os.path.join(photos_dir, 'hand_palmar.jpg')
-dorsal_image_path = os.path.join(photos_dir, 'hand_dorsal.jpg')
 
 # Test the networks
 print('Begin Palm Testing')
@@ -178,6 +175,3 @@ if not os.path.exists(net_dorsal_model_path):
 # print("Precision Unified Network: ", calculate_precision(un_labels, un_predicted))
 # print("Recall Unified Network: ", calculate_recall(un_labels, un_predicted))
 # print("F1 Score Unified Network: ", calculate_f1_score(un_labels, un_predicted),"\n")
-
-torch.save(net_palmar.state_dict(), net_palmar_model_path)
-torch.save(net_dorsal.state_dict(), net_dorsal_model_path)

@@ -8,10 +8,7 @@ def get_POI_hand(image) -> list:
     mp_hands = mp.solutions.hands
     # Converti l'immagine in RGB
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    # Rileva la mano
-    #cv2.imshow("Hand Detection", image_rgb)
-    #cv2.waitKey(0)
-    #print(image_rgb)
+    
     with mp_hands.Hands(static_image_mode=True, max_num_hands=2, min_detection_confidence=0.5) as hands:
         results = hands.process(image_rgb)
 

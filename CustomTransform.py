@@ -1,10 +1,12 @@
 import cv2
+from matplotlib import pyplot as plt
 import numpy as np
 from PIL import Image
 from torch import Size 
 from torchvision import transforms
+import torchvision
 
-from palm_cut import get_palm_cut
+from palm_cut import get_hand_cut, get_palm_cut
 
 # Custom transformation for AlexNet
 class CustomAlexNetTransform:
@@ -72,9 +74,25 @@ class CustomLBPTransform:
         self.resizeShape = resizeShape
 
     def __call__(self, image):
+        # Convert PIL -> RGB -> NumPy
+        image = image.convert('RGB')
+        image = np.array(image, dtype=np.uint8)
+
+        hand_image = get_hand_cut(image)
+
+        if hand_image is not None:
+            image= hand_image
+            
+            # img_to_show = torchvision.transforms.ToTensor()(Image.fromarray(image, mode='RGB')).clone()
+            # if img_to_show.dim() == 3:
+            #     img_to_show = img_to_show.permute(1, 2, 0)  # Da [C,H,W] a [H,W,C]
+            # img_to_show = img_to_show.cpu().numpy()
+            # plt.imshow(img_to_show)
+            # plt.title("Immagine dopo le trasformazioni")
+            # plt.axis('off')
+            # plt.show()
+
         if self.applyPalmCut:
-            image = image.convert('RGB')
-            image = np.array(image, dtype=np.uint8)
             image = get_palm_cut(image)
 
         grigio = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2GRAY)
@@ -88,9 +106,24 @@ class CustomLBPCannyTransform:
         self.resizeShape = resizeShape
 
     def __call__(self, image):
+        image = image.convert('RGB')
+        image = np.array(image, dtype=np.uint8)
+
+        hand_image = get_hand_cut(image)
+
+        if hand_image is not None:
+            image= hand_image
+            
+            # img_to_show = torchvision.transforms.ToTensor()(Image.fromarray(image, mode='RGB')).clone()
+            # if img_to_show.dim() == 3:
+            #     img_to_show = img_to_show.permute(1, 2, 0)  # Da [C,H,W] a [H,W,C]
+            # img_to_show = img_to_show.cpu().numpy()
+            # plt.imshow(img_to_show)
+            # plt.title("Immagine dopo le trasformazioni")
+            # plt.axis('off')
+            # plt.show()
+
         if self.applyPalmCut:
-            image = image.convert('RGB')
-            image = np.array(image, dtype=np.uint8)
             image = get_palm_cut(image)
 
         grigio = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
@@ -111,7 +144,22 @@ class CustomHOGTransform:
     def __call__(self, pil_image):
         # Convert PIL -> RGB -> NumPy
         image = pil_image.convert('RGB')
-        image = np.array(pil_image, dtype=np.uint8)
+        image = np.array(image, dtype=np.uint8)
+
+        hand_image = get_hand_cut(image)
+
+        if hand_image is not None:
+            image= hand_image
+            
+            # img_to_show = torchvision.transforms.ToTensor()(Image.fromarray(image, mode='RGB')).clone()
+            # if img_to_show.dim() == 3:
+            #     img_to_show = img_to_show.permute(1, 2, 0)  # Da [C,H,W] a [H,W,C]
+            # img_to_show = img_to_show.cpu().numpy()
+            # plt.imshow(img_to_show)
+            # plt.title("Immagine dopo le trasformazioni")
+            # plt.axis('off')
+            # plt.show()
+
 
         if self.applyPalmCut:
             image = get_palm_cut(image)
@@ -129,10 +177,25 @@ class CustomHOGCannyTransform:
         self.sigma=sigma
 
     def __call__(self, pil_image):
+        # Convert PIL -> RGB -> NumPy
+        image = pil_image.convert('RGB')
+        image = np.array(image, dtype=np.uint8)
+
+        hand_image = get_hand_cut(image)
+
+        if hand_image is not None:
+            image= hand_image
+            
+            # img_to_show = torchvision.transforms.ToTensor()(Image.fromarray(image, mode='RGB')).clone()
+            # if img_to_show.dim() == 3:
+            #     img_to_show = img_to_show.permute(1, 2, 0)  # Da [C,H,W] a [H,W,C]
+            # img_to_show = img_to_show.cpu().numpy()
+            # plt.imshow(img_to_show)
+            # plt.title("Immagine dopo le trasformazioni")
+            # plt.axis('off')
+            # plt.show()
 
         if self.applyPalmCut:
-            pil_image = pil_image.convert('RGB')
-            pil_image = np.array(pil_image, dtype=np.uint8)
             pil_image = get_palm_cut(pil_image)
 
         # Converti in spazio colore LAB

@@ -78,6 +78,45 @@ def get_palm_cut(image):
   
     return cropped_image
 
+def get_hand_cut(image, handNo=0):
+    xList = []
+    yList = []
+    lmsList = []
+    cropped_frame = None
+
+    # Inizializza MediaPipe Hands
+    mp_hands = mp.solutions.hands
+
+    # Converti l'immagine in RGB
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    with mp_hands.Hands(static_image_mode=True, max_num_hands=2, min_detection_confidence=0.5) as hands:
+        results = hands.process(image_rgb)
+
+        if results.multi_hand_landmarks:
+            myHand = results.multi_hand_landmarks[handNo]
+            h, w, _ = image.shape
+
+            for id, lm in enumerate(myHand.landmark):
+                cx, cy = int(lm.x * w), int(lm.y * h)
+                xList.append(cx)
+                yList.append(cy)
+                lmsList.append([id, cx, cy])
+
+            xmin, xmax = min(xList), max(xList)
+            ymin, ymax = min(yList), max(yList)
+
+            margin = 10
+            xmin_crop = max(xmin - margin, 0)
+            ymin_crop = max(ymin - margin, 0)
+            xmax_crop = min(xmax + margin, w)
+            ymax_crop = min(ymax + margin, h)
+
+            cropped_frame = image[ymin_crop:ymax_crop, xmin_crop:xmax_crop]
+
+    return cropped_frame
+
+
 
 #image_path = r'D:\Users\Patrizio\Desktop\samp\Hand_0000553.jpg'  # Sostituisci con il tuo file
 #get_palm_cut(cv2.imread(r'D:\Users\Patrizio\Desktop\samp\Hand_0000553.jpg'))

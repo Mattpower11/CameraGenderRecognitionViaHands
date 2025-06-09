@@ -149,11 +149,11 @@ print("Finished Unified Network Testing\n")
 # calculate_confusion_matrix(un_labels, un_predicted)
 
 # Calculate the loss plot
-if not os.path.exists(net_palmar_model_path):
-    calculate_loss_plot(train_loss_p)
+# if not os.path.exists(net_palmar_model_path):
+#     calculate_loss_plot(train_loss_p)
 
-if not os.path.exists(net_dorsal_model_path):
-    calculate_loss_plot(train_loss_d)
+# if not os.path.exists(net_dorsal_model_path):
+#     calculate_loss_plot(train_loss_d)
 
 # Print the performance metrics
 # print("\nPerformance Metrics\n")

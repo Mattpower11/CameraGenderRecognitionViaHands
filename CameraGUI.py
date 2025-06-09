@@ -110,8 +110,3 @@ class WebcamApp:
     def quit_app(self):
         self.cap.release()
         self.root.destroy()
-
-# if __name__ == "__main__":
-#     root = tk.Tk()
-#     app = WebcamApp(root)
-#     root.mainloop()

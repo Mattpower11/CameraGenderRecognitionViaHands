@@ -62,16 +62,6 @@ def testCNN(net:nn.Module, transforms, image_path:str):
         # Apply transformations
         image = transforms(image)
 
-        # Show image  after transformations
-        # img_to_show = image.clone()
-        # if img_to_show.dim() == 3:
-        #     img_to_show = img_to_show.permute(1, 2, 0)  # Da [C,H,W] a [H,W,C]
-        # img_to_show = img_to_show.cpu().numpy()
-        # plt.imshow(img_to_show)
-        # plt.title("Immagine dopo le trasformazioni")
-        # plt.axis('off')
-        # plt.show()
-
         image = image.unsqueeze(0)
 
         output = net(image)

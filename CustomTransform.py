@@ -83,15 +83,6 @@ class CustomLBPTransform:
         if hand_image is not None:
             image= hand_image
             
-            # img_to_show = torchvision.transforms.ToTensor()(Image.fromarray(image, mode='RGB')).clone()
-            # if img_to_show.dim() == 3:
-            #     img_to_show = img_to_show.permute(1, 2, 0)  # Da [C,H,W] a [H,W,C]
-            # img_to_show = img_to_show.cpu().numpy()
-            # plt.imshow(img_to_show)
-            # plt.title("Immagine dopo le trasformazioni")
-            # plt.axis('off')
-            # plt.show()
-
         if self.applyPalmCut:
             image = get_palm_cut(image)
 
@@ -113,15 +104,6 @@ class CustomLBPCannyTransform:
 
         if hand_image is not None:
             image= hand_image
-            
-            # img_to_show = torchvision.transforms.ToTensor()(Image.fromarray(image, mode='RGB')).clone()
-            # if img_to_show.dim() == 3:
-            #     img_to_show = img_to_show.permute(1, 2, 0)  # Da [C,H,W] a [H,W,C]
-            # img_to_show = img_to_show.cpu().numpy()
-            # plt.imshow(img_to_show)
-            # plt.title("Immagine dopo le trasformazioni")
-            # plt.axis('off')
-            # plt.show()
 
         if self.applyPalmCut:
             image = get_palm_cut(image)
@@ -150,16 +132,6 @@ class CustomHOGTransform:
 
         if hand_image is not None:
             image= hand_image
-            
-            # img_to_show = torchvision.transforms.ToTensor()(Image.fromarray(image, mode='RGB')).clone()
-            # if img_to_show.dim() == 3:
-            #     img_to_show = img_to_show.permute(1, 2, 0)  # Da [C,H,W] a [H,W,C]
-            # img_to_show = img_to_show.cpu().numpy()
-            # plt.imshow(img_to_show)
-            # plt.title("Immagine dopo le trasformazioni")
-            # plt.axis('off')
-            # plt.show()
-
 
         if self.applyPalmCut:
             image = get_palm_cut(image)
@@ -185,15 +157,6 @@ class CustomHOGCannyTransform:
 
         if hand_image is not None:
             image= hand_image
-            
-            # img_to_show = torchvision.transforms.ToTensor()(Image.fromarray(image, mode='RGB')).clone()
-            # if img_to_show.dim() == 3:
-            #     img_to_show = img_to_show.permute(1, 2, 0)  # Da [C,H,W] a [H,W,C]
-            # img_to_show = img_to_show.cpu().numpy()
-            # plt.imshow(img_to_show)
-            # plt.title("Immagine dopo le trasformazioni")
-            # plt.axis('off')
-            # plt.show()
 
         if self.applyPalmCut:
             pil_image = get_palm_cut(pil_image)
